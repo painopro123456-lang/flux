@@ -27,5 +27,8 @@
     "c2me": "*",
     "lithium": "*",
     "sodium": "*"
-  }
+  },
+  "mixins": [
+    "flux.mixins.json"
+  ]
 }
