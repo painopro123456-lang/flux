@@ -13,10 +13,18 @@ public final class Flux implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("FLUX {} initialized for Minecraft 26.2", BuildInfo.VERSION);
-        if (NativeBridge.initialize()) {
-            LOGGER.info("FLUX Rust mesh core is ready; live chunk-renderer integration is the next milestone.");
-        } else {
+        if (!NativeBridge.initialize()) {
             LOGGER.warn("FLUX native mesh core is unavailable; Minecraft's normal renderer remains active.");
+            return;
         }
+
+        int[] testMesh = NativeBridge.buildGreedyOpaqueMesh(
+                new byte[] {1, 1, 1, 1, 1, 1, 1, 1}, 2, 2, 2);
+        if (testMesh != null && testMesh.length == 36) {
+            LOGGER.info("FLUX Rust JNI self-test passed: a solid 2x2x2 cube produced six greedy quads.");
+        } else {
+            LOGGER.error("FLUX Rust JNI self-test failed; native mesh output was invalid. Vanilla rendering remains active.");
+        }
+        LOGGER.info("Rust mesh core loaded. Live Minecraft section-compiler integration remains the next milestone.");
     }
 }
