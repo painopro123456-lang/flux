@@ -32,6 +32,7 @@ public abstract class SectionCompilerMixin {
         int minZ = sectionPos.minBlockZ();
         byte[] occupancy = new byte[16 * 16 * 16];
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        int solidCount = 0;
 
         for (int y = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {
@@ -40,10 +41,14 @@ public abstract class SectionCompilerMixin {
                     BlockState state = region.getBlockState(pos);
                     if (state.isSolidRender() && !state.hasBlockEntity()) {
                         occupancy[x + 16 * (z + 16 * y)] = 1;
+                        solidCount++;
                     }
                 }
             }
         }
+
+        // Skip the native pass for sparse sections where it is unlikely to pay back its scan cost.
+        if (solidCount < 1024) return;
 
         byte[] mask = NativeBridge.findFullyOccludedBlocks(occupancy, 16, 16, 16);
         if (mask != null) {
