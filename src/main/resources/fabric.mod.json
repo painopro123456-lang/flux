@@ -3,27 +3,20 @@
   "id": "flux",
   "version": "${version}",
   "name": "FLUX",
-  "description": "Standalone Fabric performance mod with adaptive chunk-mesh scheduling for Minecraft 26.2.",
-  "authors": [
-    "FLUX Team"
-  ],
+  "description": "Fabric performance mod with a Rust native chunk-mesh core for Minecraft 26.2.",
+  "authors": ["FLUX Team"],
   "contact": {
     "sources": "https://github.com/painopro123456-lang/flux"
   },
   "license": "MIT",
   "environment": "client",
   "entrypoints": {
-    "main": [
-      "dev.flux.Flux"
-    ]
+    "main": ["dev.flux.Flux"]
   },
   "depends": {
     "fabricloader": ">=0.19.3",
     "minecraft": "26.2",
     "java": ">=25",
     "fabric-api": "*"
-  },
-  "mixins": [
-    "flux.mixins.json"
-  ]
+  }
 }
