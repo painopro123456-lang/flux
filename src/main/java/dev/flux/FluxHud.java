@@ -16,7 +16,7 @@ final class FluxHud {
 
     static void extract(GuiGraphicsExtractor graphics, DeltaTracker tickCounter) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.options.hideGui || minecraft.level == null) return;
+        if (minecraft.gui.hud.isHidden() || minecraft.level == null) return;
 
         PerformanceStats.onFrame();
 
