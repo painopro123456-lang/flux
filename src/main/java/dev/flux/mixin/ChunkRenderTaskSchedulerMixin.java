@@ -1,15 +1,15 @@
 package dev.flux.mixin;
 
-import net.minecraft.client.render.chunk.ChunkRenderTaskScheduler;
+import net.minecraft.client.renderer.chunk.SectionTaskDynamicQueue;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 /**
- * Slightly favors first-time chunk meshes over repeated rebuilds when both
- * kinds of work are queued. This helps newly visible terrain appear sooner.
+ * Limits consecutive section rebuilds so newly visible sections are not
+ * held behind an uninterrupted run of rebuild tasks.
  */
-@Mixin(ChunkRenderTaskScheduler.class)
+@Mixin(SectionTaskDynamicQueue.class)
 abstract class ChunkRenderTaskSchedulerMixin {
     @ModifyConstant(
             method = "poll",
