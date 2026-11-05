@@ -1,7 +1,6 @@
 package dev.flux.chunk;
 
 import net.minecraft.TracingExecutor;
-import net.minecraft.util.Util;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -12,14 +11,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Dedicated executor for client chunk mesh compilation.
  *
- * Minecraft's normal background executor is also used by world generation and
- * other background work. Keeping mesh compilation on a small separate pool
- * prevents those jobs from sitting in the same queue. The pool is deliberately
- * conservative on low-core systems.
+ * This isolates mesh compilation from Minecraft's shared background executor.
+ * The worker count is intentionally conservative: on a 4-logical-thread CPU,
+ * FLUX uses one mesh worker so the game and terrain generation retain CPU time.
  */
 public final class ChunkMeshExecutor {
     private static final int THREAD_COUNT =
-            Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
+            Math.max(1, Runtime.getRuntime().availableProcessors() / 4);
 
     private static final AtomicInteger THREAD_IDS = new AtomicInteger();
 
@@ -27,6 +25,7 @@ public final class ChunkMeshExecutor {
         Thread thread = new Thread(task,
                 "FLUX Chunk Mesh #" + THREAD_IDS.incrementAndGet());
         thread.setDaemon(true);
+        thread.setPriority(Thread.NORM_PRIORITY - 1);
         return thread;
     };
 
