@@ -11,21 +11,42 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Check out source
         uses: actions/checkout@v4
+
       - name: Set up Java 25
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '25'
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Run Rust unit tests
+        run: cargo test --manifest-path native/flux-native/Cargo.toml
+
+      - name: Build Rust native DLL
+        run: cargo build --manifest-path native/flux-native/Cargo.toml --release --target x86_64-pc-windows-msvc
+
+      - name: Package Rust DLL into mod resources
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force src/main/resources/natives/windows-x86_64 | Out-Null
+          Copy-Item native/flux-native/target/x86_64-pc-windows-msvc/release/flux.dll src/main/resources/natives/windows-x86_64/flux.dll -Force
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.6.0'
-      - name: Build mod
+
+      - name: Build Fabric mod
         run: gradle build --no-daemon
+
       - name: Upload mod JAR
         uses: actions/upload-artifact@v4
         with:
