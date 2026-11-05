@@ -4,9 +4,9 @@ FLUX is a standalone client-side Fabric performance project for Minecraft 26.2.
 
 ## Rust rendering core — first integration milestone
 
-The project contains a Rust cdylib and a Java JNI loader. On Windows x64, the mod extracts the packaged flux.dll into Fabric's config directory and loads it. The native API accepts a byte-per-cell occupancy snapshot for opaque full cubes and returns exposed-face descriptors. Internal faces between adjacent solid cells are culled in Rust.
+The project contains a Rust cdylib and a Java JNI loader. On Windows x64, the mod extracts the packaged flux.dll into Fabric's config directory and loads it. Rust provides greedy opaque-cube meshing and a full-occlusion mask. Minecraft section compilation now builds a conservative occupancy snapshot and skips model tessellation only for opaque full cubes fully enclosed inside a dense section. Block entities and non-full-cube models remain on vanilla's path.
 
-This is the foundation of the Rust mesh pipeline, not yet a replacement for Minecraft's live chunk renderer. The current Minecraft renderer still owns model baking, block states, textures, lighting, biome tint, transparency, fluids, GPU buffer upload, and draw submission. The next integration step is to connect real section snapshots to this API and route supported geometry back into Minecraft while retaining a vanilla fallback for unsupported models.
+FLUX does not replace the entire Minecraft renderer. Minecraft still owns model baking, textures, lighting, biome tint, transparency, fluids, GPU buffer upload, and draw submission. Rust currently accelerates one conservative culling step in the live section compiler; it does not yet generate all final Minecraft vertices. Full geometry replacement requires preserving material, light, tint, fluid, and custom-model data.
 
 ## Build
 
@@ -17,5 +17,5 @@ The GitHub Actions workflow builds the Rust DLL for Windows x64, runs Rust unit 
 - Minecraft 26.2, Fabric Loader 0.19.3+, Java 25.
 - No C2ME dependency.
 - Native engine currently targets Windows x64.
-- Rust currently handles exposed-face extraction for opaque full-cube occupancy only.
-- No chunk-load speedup or in-game performance gain is claimed until the Minecraft section-renderer integration is complete and benchmarked.
+- Rust currently handles greedy opaque-cube meshing and section occlusion analysis.
+- The new section-compiler hook must be benchmarked in-game before any speedup is claimed.
