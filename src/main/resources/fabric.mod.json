@@ -3,7 +3,7 @@
   "id": "flux",
   "version": "${version}",
   "name": "FLUX",
-  "description": "A performance mod focused on smoother chunk streaming and better frame-time consistency.",
+  "description": "A lightweight Fabric performance mod focused on smoother chunk loading and reduced stuttering.",
   "authors": [
     "FLUX Team"
   ],
@@ -15,11 +15,11 @@
   "entrypoints": {
     "main": [
       "dev.flux.Flux"
-    ],
-    "client": [
-      "dev.flux.FluxClient"
     ]
   },
+  "mixins": [
+    "flux.mixins.json"
+  ],
   "depends": {
     "fabricloader": ">=0.19.3",
     "minecraft": "26.2",
