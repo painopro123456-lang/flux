@@ -11,9 +11,9 @@ FLUX is a standalone client-side Fabric performance mod for Minecraft 26.2. It d
 
 ## Chunk mesh scheduling
 
-FLUX routes client chunk mesh compilation to a dedicated, conservative worker pool instead of Minecraft's shared background executor. This is intended to reduce competition between chunk mesh building and world-generation/background tasks while exploring.
+FLUX routes client chunk mesh compilation to a dedicated worker pool instead of Minecraft's shared background executor. The default worker count matches vanilla's background-pool sizing: max(1, logical CPU count - 1). On a 4-logical-thread CPU this gives 3 mesh workers, rather than serializing mesh work through one worker.
 
-The worker count defaults to max(1, logical CPU count - 1). On a dual-core CPU this is one dedicated mesh worker. This avoids aggressively oversubscribing a low-core laptop. It does not parallelize Minecraft's main game tick or replace the terrain-generation algorithm.
+This isolates mesh compilation from unrelated background tasks, but it does not parallelize terrain generation, disk I/O, or Minecraft's main game tick. It therefore cannot guarantee faster first-time terrain generation or 16-chunk performance on every system. Worker oversubscription can also hurt performance, so this default should be benchmarked on the target laptop.
 
 The executor redirection is based on the MIT-licensed Multicore Magic project by the-real-ltcg; see NOTICE for attribution and license terms.
 
