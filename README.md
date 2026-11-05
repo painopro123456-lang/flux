@@ -1,38 +1,40 @@
 # FLUX
 
-FLUX is a client-side Fabric performance mod for Minecraft 26.2.
+FLUX is a lightweight Fabric compatibility and performance helper for Minecraft 26.2.
 
 ## Target hardware profile
 
-The target test laptop profile is:
 - Intel Core i5-6200U (2 cores / 4 threads)
 - NVIDIA GeForce 920MX
 - 6 GB system RAM
 
-The performance target is **16 render distance + 16 simulation distance**. This is a target, not a guarantee.
+The target remains **16 render distance + 16 simulation distance**. This is a goal, not a guaranteed result on this hardware.
 
-## Current status
+## Chunk loading
 
-FLUX 0.2.1 restores the vanilla section rebuild quota. The earlier quota reduction was not supported by in-game benchmark evidence and could make chunk rebuild throughput worse. FLUX does not currently claim a measured FPS or chunk-loading improvement over vanilla.
+FLUX does not replace Minecraft's chunk-generation engine. Its previous section-queue mixin was a no-op in 0.2.1 and has been removed.
 
-## Optional companion optimizations
+For actual chunk generation, loading, and I/O optimization, install **C2ME for Minecraft 26.2 Fabric** alongside FLUX:
+- Official project and downloads: https://modrinth.com/mod/c2me-fabric
+- Select a file explicitly marked **26.2 + Fabric**. Do not use a 26.3 build.
+- C2ME is a separate mod and is not bundled inside the FLUX JAR.
+- Back up existing worlds before testing experimental C2ME builds.
 
-These are separate, optional mods and are not bundled:
-- **C2ME** — parallelizes chunk generation, loading, and I/O. On a 2-core CPU, extra concurrency can also increase contention and memory pressure.
-- **Lithium** — optimizes game logic and ticking.
-- **Sodium** — replaces the renderer and may improve rendering performance, depending on the GPU and settings.
+FLUX detects C2ME at startup and reports whether it is present. Without C2ME, FLUX does not claim a chunk-generation speedup.
 
-Only install builds explicitly compatible with Minecraft 26.2 and Fabric. Back up worlds before testing chunk-generation mods.
+## Hardware tuning notes
+
+This laptop has 2 CPU cores and 6 GB total RAM, with Windows already using a substantial portion. Do not force a large C2ME worker count or allocate most system memory to Minecraft. Start with C2ME's automatic worker setting and the default config; change one setting at a time only after testing for stutter and memory pressure.
 
 ## Benchmark protocol
 
-Compare vanilla Fabric against FLUX using the same world, seed, route, settings, and companion-mod set. Record average FPS, 1% lows, frame-time spikes, and the time for newly explored chunks to become visible. Run at least three passes after a warm-up pass.
+Compare vanilla Fabric against Fabric + FLUX + C2ME using the same world, seed, route, settings, and warm-up. Record average FPS, 1% lows, frame-time spikes, and time for newly explored chunks to become visible. Run at least three passes.
 
-A successful Gradle build is not proof of an in-game performance gain.
+Published C2ME benchmarks use much stronger hardware and must not be treated as expected results for this laptop.
 
 ## Compatibility
 
-Designed for Minecraft 26.2, Fabric Loader 0.19.3+, and Java 25+. Compatibility with renderer replacements and other mixin-heavy mods requires in-game testing.
+Designed for Minecraft 26.2, Fabric Loader 0.19.3+, and Java 25+.
 
 ## Build
 
