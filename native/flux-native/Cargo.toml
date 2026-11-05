@@ -1,0 +1,11 @@
+[package]
+name = "flux-native"
+version = "0.3.0"
+edition = "2021"
+
+[lib]
+name = "flux"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+jni = "0.21.1"
