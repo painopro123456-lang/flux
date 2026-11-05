@@ -11,13 +11,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Dedicated executor for client chunk mesh compilation.
  *
- * This isolates mesh compilation from Minecraft's shared background executor.
- * The worker count is intentionally conservative: on a 4-logical-thread CPU,
- * FLUX uses one mesh worker so the game and terrain generation retain CPU time.
+ * Match vanilla's background pool sizing by default instead of starving mesh
+ * compilation with a single worker on a 4-thread laptop CPU.
  */
 public final class ChunkMeshExecutor {
     private static final int THREAD_COUNT =
-            Math.max(1, Runtime.getRuntime().availableProcessors() / 4);
+            Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
 
     private static final AtomicInteger THREAD_IDS = new AtomicInteger();
 
@@ -25,7 +24,7 @@ public final class ChunkMeshExecutor {
         Thread thread = new Thread(task,
                 "FLUX Chunk Mesh #" + THREAD_IDS.incrementAndGet());
         thread.setDaemon(true);
-        thread.setPriority(Thread.NORM_PRIORITY - 1);
+        thread.setPriority(Thread.NORM_PRIORITY);
         return thread;
     };
 
