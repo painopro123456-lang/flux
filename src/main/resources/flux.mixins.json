@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "package": "dev.flux.mixin",
+  "client": [
+    "ChunkRenderTaskSchedulerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
