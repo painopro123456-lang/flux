@@ -1,28 +1,22 @@
 # FLUX
 
-FLUX is a client-side Fabric performance project focused on smoother chunk streaming, lower frame-time spikes, and efficient rendering.
+FLUX is a lightweight client-side Fabric mod focused on smoother chunk loading and reduced stuttering.
 
 ## Target
 
 - Minecraft 26.2
-- Fabric Loader
-- Java 25
-- Designed to coexist with Sodium, Lithium, FerriteCore, ImmediatelyFast, Entity Culling, ModernFix, Krypton, and other optimization mods.
+- Fabric Loader 0.19.3+
+- Java 25+
 
-## Current implementation
+## Current optimization
 
-- Lightweight in-game performance panel.
-- Rolling frame-time measurements and an estimated 1% low.
-- Client chunk load/unload activity per second.
-- Measurements are diagnostic only; they do not change vanilla chunk scheduling.
+FLUX adjusts vanilla's client chunk-render task queue to favor first-time chunk mesh builds slightly more often than repeat rebuilds when both are waiting. This is intended to help newly visible terrain appear sooner while avoiding a custom thread pool or extra background systems.
 
-## Roadmap
+FLUX runs quietly in the background. There is no HUD, menu, or extra configuration to manage.
 
-1. Use the measurements to identify chunk-streaming and frame-time bottlenecks.
-2. Add compatibility-aware chunk pipeline improvements only where FLUX can provide a measurable benefit.
-3. Benchmark average FPS, 1% lows, and chunk-loading behavior against a clean baseline and common optimization mods.
+## Compatibility
 
-FLUX will avoid duplicating features already provided by installed optimization mods. No performance gains are claimed until they are benchmarked.
+Designed to complement other performance mods rather than replace them. Compatibility with Sodium and other chunk-renderer replacements still needs in-game testing.
 
 ## Build
 
