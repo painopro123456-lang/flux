@@ -1,3 +1,5 @@
+mod occlusion;
+
 use jni::objects::{JByteArray, JClass};
 use jni::sys::{jint, jintArray};
 use jni::JNIEnv;
@@ -105,6 +107,37 @@ fn java_int_array(mut env: JNIEnv, values: &[i32]) -> jintArray {
         return std::ptr::null_mut();
     }
     array.into_raw()
+}
+
+/// JNI entrypoint for dev.flux.nativebridge.NativeBridge.findFullyOccludedBlocksNative.
+#[no_mangle]
+pub extern "system" fn Java_dev_flux_nativebridge_NativeBridge_findFullyOccludedBlocksNative(
+    mut env: JNIEnv,
+    _class: JClass,
+    voxels: JByteArray,
+    width: jint,
+    height: jint,
+    depth: jint,
+) -> jni::sys::jbyteArray {
+    if width <= 0 || height <= 0 || depth <= 0 { return std::ptr::null_mut(); }
+    let (w, h, d) = (width as usize, height as usize, depth as usize);
+    let expected = match w.checked_mul(h).and_then(|v| v.checked_mul(d)) {
+        Some(value) if value <= i32::MAX as usize => value,
+        _ => return std::ptr::null_mut(),
+    };
+    let data = match env.convert_byte_array(&voxels) {
+        Ok(data) if data.len() == expected => data,
+        _ => return std::ptr::null_mut(),
+    };
+    let mask = occlusion::fully_occluded_mask(&data, w, h, d);
+    let output = match env.new_byte_array(mask.len() as i32) {
+        Ok(array) => array,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    if env.set_byte_array_region(&output, 0, &mask).is_err() {
+        return std::ptr::null_mut();
+    }
+    output.into_raw()
 }
 
 /// JNI entrypoint for dev.flux.nativebridge.NativeBridge.buildGreedyOpaqueMeshNative.
