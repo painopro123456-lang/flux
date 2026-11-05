@@ -1,14 +1,11 @@
 package dev.flux;
 
+import dev.flux.nativebridge.NativeBridge;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * FLUX standalone client performance mod.
- * It deliberately leaves Minecraft's chunk-generation and mesh executors
- * under vanilla control until a measured, version-specific replacement exists.
- */
+/** FLUX Fabric entrypoint. */
 public final class Flux implements ModInitializer {
     public static final String MOD_ID = "flux";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -16,7 +13,10 @@ public final class Flux implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("FLUX {} initialized for Minecraft 26.2", BuildInfo.VERSION);
-        LOGGER.info("Vanilla chunk-generation and mesh scheduling preserved; no extra worker pool started.");
-        LOGGER.info("FLUX runs standalone; no companion performance mods are required.");
+        if (NativeBridge.initialize()) {
+            LOGGER.info("FLUX Rust mesh core is ready; live chunk-renderer integration is the next milestone.");
+        } else {
+            LOGGER.warn("FLUX native mesh core is unavailable; Minecraft's normal renderer remains active.");
+        }
     }
 }
