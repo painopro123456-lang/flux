@@ -12,7 +12,7 @@ import java.nio.file.StandardCopyOption;
 
 /**
  * Thin Windows x64 JNI bridge to FLUX's Rust chunk-mesh core.
- * The first native milestone supports opaque full-cube occupancy snapshots.
+ * Native mesh input is a byte-per-cell opaque full-cube occupancy snapshot.
  */
 public final class NativeBridge {
     private static volatile boolean loaded;
@@ -41,7 +41,7 @@ public final class NativeBridge {
             Files.copy(input, library, StandardCopyOption.REPLACE_EXISTING);
             System.load(library.toAbsolutePath().toString());
             loaded = true;
-            Flux.LOGGER.info("FLUX Rust native mesh engine loaded from {}", library);
+            Flux.LOGGER.info("FLUX Rust greedy mesh engine loaded from {}", library);
             return true;
         } catch (IOException | UnsatisfiedLinkError | SecurityException exception) {
             Flux.LOGGER.error("Could not load FLUX Rust engine; Minecraft will keep its normal renderer.", exception);
@@ -50,17 +50,20 @@ public final class NativeBridge {
     }
 
     /**
-     * Returns [x,y,z,faceId] tuples for exposed faces. Null means native unavailable.
-     * Occupancy layout: x + width * (z + depth * y); non-zero cells are solid.
+     * Builds greedy quads for opaque full-cube occupancy.
+     * Output is a flat int array of six-int records:
+     * [x, y, z, faceId, width, height].
+     * Face IDs: 0=-X, 1=+X, 2=-Y, 3=+Y, 4=-Z, 5=+Z.
+     * Returns null if the native engine is unavailable.
      */
-    public static int[] buildOpaqueMesh(byte[] occupancy, int width, int height, int depth) {
+    public static int[] buildGreedyOpaqueMesh(byte[] occupancy, int width, int height, int depth) {
         if (!loaded || occupancy == null || width <= 0 || height <= 0 || depth <= 0) return null;
         long expected = (long) width * height * depth;
         if (expected != occupancy.length) {
             throw new IllegalArgumentException("Occupancy length must equal width * height * depth");
         }
-        return buildOpaqueMeshNative(occupancy, width, height, depth);
+        return buildGreedyOpaqueMeshNative(occupancy, width, height, depth);
     }
 
-    private static native int[] buildOpaqueMeshNative(byte[] occupancy, int width, int height, int depth);
+    private static native int[] buildGreedyOpaqueMeshNative(byte[] occupancy, int width, int height, int depth);
 }
