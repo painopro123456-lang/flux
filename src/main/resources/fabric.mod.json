@@ -3,7 +3,7 @@
   "id": "flux",
   "version": "${version}",
   "name": "FLUX",
-  "description": "A lightweight Fabric performance mod focused on smoother chunk loading and reduced stuttering.",
+  "description": "A standalone Fabric client performance mod with a dedicated chunk mesh executor for smoother chunk rebuild scheduling.",
   "authors": [
     "FLUX Team"
   ],
@@ -22,11 +22,6 @@
     "minecraft": "26.2",
     "java": ">=25",
     "fabric-api": "*"
-  },
-  "suggests": {
-    "c2me": "*",
-    "lithium": "*",
-    "sodium": "*"
   },
   "mixins": [
     "flux.mixins.json"
