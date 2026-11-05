@@ -4,7 +4,9 @@
   "version": "${version}",
   "name": "FLUX",
   "description": "A performance mod focused on smoother chunk streaming and better frame-time consistency.",
-  "authors": ["FLUX Team"],
+  "authors": [
+    "FLUX Team"
+  ],
   "contact": {
     "sources": "https://github.com/painopro123456-lang/flux"
   },
@@ -13,6 +15,9 @@
   "entrypoints": {
     "main": [
       "dev.flux.Flux"
+    ],
+    "client": [
+      "dev.flux.FluxClient"
     ]
   },
   "depends": {
