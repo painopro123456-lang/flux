@@ -65,5 +65,20 @@ public final class NativeBridge {
         return buildGreedyOpaqueMeshNative(occupancy, width, height, depth);
     }
 
+    /**
+     * Returns a byte mask marking solid cells fully surrounded by solid cells.
+     * The caller must only use this to skip opaque full-cube model tessellation.
+     */
+    public static byte[] findFullyOccludedBlocks(byte[] occupancy, int width, int height, int depth) {
+        if (!loaded || occupancy == null || width <= 0 || height <= 0 || depth <= 0) return null;
+        long expected = (long) width * height * depth;
+        if (expected != occupancy.length) {
+            throw new IllegalArgumentException("Occupancy length must equal width * height * depth");
+        }
+        return findFullyOccludedBlocksNative(occupancy, width, height, depth);
+    }
+
+    private static native byte[] findFullyOccludedBlocksNative(byte[] occupancy, int width, int height, int depth);
+
     private static native int[] buildGreedyOpaqueMeshNative(byte[] occupancy, int width, int height, int depth);
 }
