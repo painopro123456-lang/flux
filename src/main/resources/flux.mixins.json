@@ -2,7 +2,6 @@
   "required": true,
   "minVersion": "0.8",
   "package": "dev.flux.mixin",
-  "compatibilityLevel": "JAVA_25",
   "client": [
     "SectionTaskDynamicQueueMixin"
   ],
