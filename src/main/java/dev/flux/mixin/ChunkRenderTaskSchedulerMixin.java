@@ -6,8 +6,8 @@ import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
 /**
- * Limits consecutive section rebuilds so newly visible sections are not
- * held behind an uninterrupted run of rebuild tasks.
+ * Keeps the vanilla section rebuild quota unchanged until a measured,
+ * workload-specific scheduling improvement is available.
  */
 @Mixin(SectionTaskDynamicQueue.class)
 abstract class ChunkRenderTaskSchedulerMixin {
@@ -16,7 +16,7 @@ abstract class ChunkRenderTaskSchedulerMixin {
             constant = @Constant(intValue = 2),
             require = 1
     )
-    private int flux$prioritizeInitialChunkBuilds(int vanillaQuota) {
-        return 1;
+    private int flux$keepVanillaRebuildQuota(int vanillaQuota) {
+        return vanillaQuota;
     }
 }
