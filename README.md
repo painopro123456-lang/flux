@@ -1,33 +1,21 @@
 # FLUX
 
-FLUX is a standalone client-side Fabric performance mod for Minecraft 26.2. It does not require C2ME, Lithium, or Sodium.
+FLUX is a standalone client-side Fabric performance project for Minecraft 26.2.
 
-## Target hardware
+## Rust rendering core — first integration milestone
 
-- Intel Core i5-6200U (2 cores / 4 threads)
-- NVIDIA GeForce 920MX
-- 6 GB system RAM
-- Target: **16 render distance + 16 simulation distance** (a goal, not a guarantee)
+The project contains a Rust cdylib and a Java JNI loader. On Windows x64, the mod extracts the packaged flux.dll into Fabric's config directory and loads it. The native API accepts a byte-per-cell occupancy snapshot for opaque full cubes and returns exposed-face descriptors. Internal faces between adjacent solid cells are culled in Rust.
 
-## Chunk scheduling
-
-FLUX 0.2.4 removes the previous dedicated three-thread chunk-mesh pool. That pool ran alongside Minecraft's own world-generation workers and could compete with terrain generation for CPU time on low-core laptops. FLUX now leaves both chunk generation and mesh scheduling on Minecraft's native executors rather than adding an unmeasured competing pool.
-
-This is a contention-reduction correction, not a claim that terrain generation has been accelerated. Faster terrain generation requires profiling the exact 26.2 generation pipeline and changing its scheduling safely. Startup speed also needs measurement; FLUX currently performs only lightweight initialization.
-
-## Compatibility
-
-- Minecraft 26.2
-- Fabric Loader 0.19.3+
-- Java 25+
-- Fabric API for 26.2
-
-No companion optimization mods are required.
-
-## Benchmarking
-
-A successful build verifies compilation only. In-game testing is still required to measure cold startup time, world-entry time, chunk visibility time, FPS, and frame-time spikes against the previous build and vanilla using the same world and settings. Run multiple passes after a warm-up.
+This is the foundation of the Rust mesh pipeline, not yet a replacement for Minecraft's live chunk renderer. The current Minecraft renderer still owns model baking, block states, textures, lighting, biome tint, transparency, fluids, GPU buffer upload, and draw submission. The next integration step is to connect real section snapshots to this API and route supported geometry back into Minecraft while retaining a vanilla fallback for unsupported models.
 
 ## Build
 
-Run `gradle build` (Windows: `gradle.bat build`). The mod JAR is in `build/libs/`.
+The GitHub Actions workflow builds the Rust DLL for Windows x64, runs Rust unit tests, packages the DLL into the Fabric JAR, and builds the mod with Java 25 / Gradle.
+
+## Compatibility and performance
+
+- Minecraft 26.2, Fabric Loader 0.19.3+, Java 25.
+- No C2ME dependency.
+- Native engine currently targets Windows x64.
+- Rust currently handles exposed-face extraction for opaque full-cube occupancy only.
+- No chunk-load speedup or in-game performance gain is claimed until the Minecraft section-renderer integration is complete and benchmarked.
